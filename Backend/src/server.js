@@ -10,6 +10,7 @@ const xssRoutes = require('./routes/xssRoutes');
 const csrfRoutes = require('./routes/csrfRoutes');
 const commandInjectionRoutes = require('./routes/commandInjectionRoutes');
 const xxeRoutes = require('./routes/xxeRoutes');
+const pathTraversalRoutes = require('./routes/pathTraversalRoutes');
 
 dotenv.config();
 
@@ -31,6 +32,7 @@ app.use('/api/xss', xssRoutes);
 app.use('/api/csrf', csrfRoutes);
 app.use('/api/command-injection', commandInjectionRoutes);
 app.use('/api/xxe', xxeRoutes);
+app.use('/api/path-traversal', pathTraversalRoutes);
 
 app.get('/', (req, res) => {
   res.send('Scanner running');
