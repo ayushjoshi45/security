@@ -19,6 +19,7 @@ const brokenAuthRoutes = require('./routes/brokenAuthRoutes');
 const sensitiveDataExposureRoutes = require('./routes/sensitiveDataExposureRoutes');
 const pipelineRoutes = require('./routes/pipelineRoutes');
 const scanRoutes = require('./routes/scanRoutes');
+const { bindRealtimeIo, emitRealtimeLog } = require('./services/realtimeLogService');
 
 dotenv.config();
 
@@ -30,6 +31,8 @@ const io = new Server(server, {
     methods: ['GET', 'POST']
   }
 });
+
+bindRealtimeIo(io);
 
 app.use(cors({ origin: process.env.CLIENT_ORIGIN || 'http://localhost:3000' }));
 app.use(express.json());
@@ -56,13 +59,20 @@ app.get('/', (req, res) => {
 
 io.on('connection', (socket) => {
   console.log(`Socket connected: ${socket.id}`);
+  emitRealtimeLog('info', 'socket.connected', 'Client connected to realtime log stream', {
+    socketId: socket.id
+  });
 
   socket.on('disconnect', () => {
     console.log(`Socket disconnected: ${socket.id}`);
+    emitRealtimeLog('info', 'socket.disconnected', 'Client disconnected from realtime log stream', {
+      socketId: socket.id
+    });
   });
 });
 
 const port = Number(process.env.PORT) || 5000;
 server.listen(port, () => {
   console.log(`Backend server listening on http://localhost:${port}`);
+  emitRealtimeLog('info', 'server.started', 'Backend server started', { port });
 });
