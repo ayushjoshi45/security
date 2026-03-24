@@ -1,7 +1,9 @@
+const DEFAULT_API_URL_PRODUCTION = 'https://security-khom.onrender.com';
+
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL ||
   import.meta.env.VITE_BACKEND_URL ||
-  'http://localhost:5000';
+  (import.meta.env.DEV ? 'http://localhost:5000' : DEFAULT_API_URL_PRODUCTION);
 
 export async function apiRequest(path, options = {}) {
   const response = await fetch(`${API_BASE_URL}${path}`, {

@@ -23,12 +23,19 @@ const { bindRealtimeIo, emitRealtimeLog } = require('./services/realtimeLogServi
 
 dotenv.config();
 
+/** Always allowed: local dev + deployed frontend. CLIENT_ORIGIN adds more (e.g. custom domain). */
+const BUILTIN_ALLOWED_ORIGINS = [
+  'http://localhost:5173',
+  'https://security-ebon-tau.vercel.app'
+];
+
 function parseAllowedOrigins() {
-  const raw = process.env.CLIENT_ORIGIN || 'http://localhost:3000';
-  return raw
+  const raw = process.env.CLIENT_ORIGIN || '';
+  const fromEnv = raw
     .split(',')
     .map((origin) => origin.trim())
     .filter(Boolean);
+  return [...new Set([...BUILTIN_ALLOWED_ORIGINS, ...fromEnv])];
 }
 
 const allowedOrigins = parseAllowedOrigins();
