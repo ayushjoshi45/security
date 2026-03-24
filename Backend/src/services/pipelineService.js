@@ -155,6 +155,25 @@ async function scanWebsitePipeline(baseUrl, options = {}) {
 
   const method = String(options.method || 'POST').toUpperCase();
   const timeoutMs = Number.isInteger(options.timeoutMs) ? options.timeoutMs : 10000;
+  const onLog = typeof options.onLog === 'function' ? options.onLog : null;
+
+  function log(event, message, meta = {}) {
+    if (!onLog) {
+      return;
+    }
+
+    try {
+      onLog(event, message, meta);
+    } catch (error) {
+      // Ignore log callback errors to keep scan flow stable.
+    }
+  }
+
+  log('started', 'Pipeline scan started', {
+    baseUrl,
+    depth: Number.isInteger(options.depth) ? options.depth : 1,
+    maxPages: Number.isInteger(options.maxPages) ? options.maxPages : 20
+  });
 
   const crawlResult = await crawlWebsite(baseUrl, {
     depth: Number.isInteger(options.depth) ? options.depth : 1,
@@ -168,6 +187,12 @@ async function scanWebsitePipeline(baseUrl, options = {}) {
   let totalVulnerabilities = 0;
 
   for (const page of crawlResult.pages) {
+    log('page.started', 'Scanning page checks', {
+      pageUrl: page.url,
+      crawlDepth: page.depth,
+      formsDiscovered: (page.forms || []).length
+    });
+
     const pageChecks = await Promise.all([
       runCheck('csrf', () => testCsrf(page.url)),
       runCheck('securityHeaders', () => testSecurityHeaders({ url: page.url, timeoutMs })),
@@ -186,6 +211,13 @@ async function scanWebsitePipeline(baseUrl, options = {}) {
       const targetUrl = form.action || page.url;
       const inputNames = normalizeInputs(form.inputs);
       const formChecks = [];
+
+      log('form.started', 'Scanning form checks', {
+        pageUrl: page.url,
+        formAction: targetUrl,
+        formMethod: form.method || method,
+        inputCount: inputNames.length
+      });
 
       if (inputNames.length > 0) {
         const formInputTarget = {
@@ -262,6 +294,12 @@ async function scanWebsitePipeline(baseUrl, options = {}) {
         inputCount: inputNames.length,
         checks: classifiedFormChecks
       });
+
+      log('form.completed', 'Completed form checks', {
+        pageUrl: page.url,
+        formAction: targetUrl,
+        vulnerabilities: countVulnerabilitiesFromChecks(classifiedFormChecks)
+      });
     }
 
     pageReports.push({
@@ -272,10 +310,27 @@ async function scanWebsitePipeline(baseUrl, options = {}) {
       pageChecks: classifiedPageChecks,
       formReports
     });
+
+    log('page.completed', 'Completed page checks', {
+      pageUrl: page.url,
+      vulnerabilities:
+        countVulnerabilitiesFromChecks(classifiedPageChecks) +
+        formReports.reduce(
+          (sum, report) => sum + countVulnerabilitiesFromChecks(report.checks || []),
+          0
+        )
+    });
   }
 
   const vulnerabilities = collectVulnerabilities(pageReports);
   const severityCounts = buildSeverityCounts(vulnerabilities);
+
+  log('completed', 'Pipeline scan completed', {
+    baseUrl: crawlResult.baseUrl,
+    totalPagesScanned: crawlResult.totalPagesCrawled,
+    totalFormsScanned,
+    totalVulnerabilities
+  });
 
   return {
     type: 'Full Scan Pipeline',

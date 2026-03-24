@@ -1,5 +1,6 @@
 const { scanWebsitePipeline } = require('./pipelineService');
 const { generateReport } = require('./reportService');
+const { emitRealtimeLog } = require('./realtimeLogService');
 
 const scanJobs = new Map();
 const MAX_TRACKED_SCANS = 100;
@@ -68,7 +69,19 @@ function runScanInBackground(scanId) {
         return;
       }
 
-      const result = await scanWebsitePipeline(job.input.url, job.input.options);
+      emitRealtimeLog('info', 'scan.tracked.started', 'Tracked scan started', {
+        scanId,
+        url: job.input.url
+      });
+
+      const result = await scanWebsitePipeline(job.input.url, {
+        ...(job.input.options || {}),
+        onLog: (event, message, meta) =>
+          emitRealtimeLog('info', `scan.tracked.pipeline.${event}`, message, {
+            scanId,
+            ...(meta || {})
+          })
+      });
       const report = generateReport(result);
 
       scanJobs.set(scanId, {
@@ -78,6 +91,12 @@ function runScanInBackground(scanId) {
         completedAt: new Date().toISOString(),
         result,
         report
+      });
+
+      emitRealtimeLog('info', 'scan.tracked.completed', 'Tracked scan completed', {
+        scanId,
+        totalVulnerabilities: result.totalVulnerabilities,
+        riskLevel: report.riskLevel
       });
     })
     .catch((error) => {
@@ -91,6 +110,11 @@ function runScanInBackground(scanId) {
         status: 'failed',
         updatedAt: new Date().toISOString(),
         failedAt: new Date().toISOString(),
+        error: error.message
+      });
+
+      emitRealtimeLog('error', 'scan.tracked.failed', 'Tracked scan failed', {
+        scanId,
         error: error.message
       });
     });
