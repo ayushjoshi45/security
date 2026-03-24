@@ -1,4 +1,5 @@
 const { scanWebsitePipeline } = require('../services/pipelineService');
+const { generateReport } = require('../services/reportService');
 
 function parseNumber(value, fallback) {
   const parsed = Number.parseInt(value, 10);
@@ -35,7 +36,12 @@ async function createScan(req, res) {
       timeoutMs: parseNumber(body.timeoutMs ?? query.timeoutMs, 10000)
     });
 
-    return res.json(result);
+    const report = generateReport(result);
+
+    return res.json({
+      ...result,
+      report
+    });
   } catch (error) {
     return res.status(500).json({ error: 'Scan failed', detail: error.message });
   }
