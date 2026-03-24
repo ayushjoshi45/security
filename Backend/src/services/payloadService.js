@@ -1,4 +1,4 @@
-const PAYLOADS_BY_TYPE = {
+const payloadsByType = {
   sql: ["' OR 1=1 --", "' OR 'a'='a", "admin' --", "' UNION SELECT NULL --"],
   xss: [
     '<script>alert(1)</script>',
@@ -53,9 +53,7 @@ const PAYLOADS_BY_TYPE = {
 };
 
 function normalizeType(type) {
-  return String(type || '')
-    .toLowerCase()
-    .replace(/[\s_-]/g, '');
+  return String(type || '').toLowerCase().replace(/[\s_-]/g, '');
 }
 
 function getPayloadTypes() {
@@ -65,26 +63,24 @@ function getPayloadTypes() {
 function getPayloads(type) {
   if (!type) {
     return {
-      sql: PAYLOADS_BY_TYPE.sql,
-      xss: PAYLOADS_BY_TYPE.xss,
-      command: PAYLOADS_BY_TYPE.command,
-      xxe: PAYLOADS_BY_TYPE.xxe,
-      pathTraversal: PAYLOADS_BY_TYPE.pathtraversal,
-      ldap: PAYLOADS_BY_TYPE.ldap,
-      nosql: PAYLOADS_BY_TYPE.nosql,
-      fileUpload: PAYLOADS_BY_TYPE.fileupload,
-      auth: PAYLOADS_BY_TYPE.auth
+      sql: payloadsByType.sql,
+      xss: payloadsByType.xss,
+      command: payloadsByType.command,
+      xxe: payloadsByType.xxe,
+      pathTraversal: payloadsByType.pathtraversal,
+      ldap: payloadsByType.ldap,
+      nosql: payloadsByType.nosql,
+      fileUpload: payloadsByType.fileupload,
+      auth: payloadsByType.auth
     };
   }
 
   const normalizedType = normalizeType(type);
-  const payloads = PAYLOADS_BY_TYPE[normalizedType];
-
-  if (!payloads) {
+  if (!payloadsByType[normalizedType]) {
     throw new Error(`Unsupported payload type: ${type}`);
   }
 
-  return payloads;
+  return payloadsByType[normalizedType];
 }
 
 function pickPayload(type, index = 0) {
@@ -103,7 +99,7 @@ function pickPayload(type, index = 0) {
 
 function injectPayload(inputs, payload) {
   if (!Array.isArray(inputs) || inputs.length === 0) {
-    throw new Error('Inputs must be a non-empty array');
+    throw new Error('inputs must be a non-empty array');
   }
 
   const data = {};
@@ -115,6 +111,7 @@ function injectPayload(inputs, payload) {
 
     if (input && typeof input.name === 'string' && input.name.trim()) {
       data[input.name] = payload;
+      continue;
     }
   }
 
