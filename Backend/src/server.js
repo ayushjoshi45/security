@@ -18,6 +18,7 @@ const securityHeadersRoutes = require('./routes/securityHeadersRoutes');
 const brokenAuthRoutes = require('./routes/brokenAuthRoutes');
 const sensitiveDataExposureRoutes = require('./routes/sensitiveDataExposureRoutes');
 const pipelineRoutes = require('./routes/pipelineRoutes');
+const scanRoutes = require('./routes/scanRoutes');
 
 dotenv.config();
 
@@ -47,6 +48,7 @@ app.use('/api/security-headers', securityHeadersRoutes);
 app.use('/api/broken-auth', brokenAuthRoutes);
 app.use('/api/sensitive-data-exposure', sensitiveDataExposureRoutes);
 app.use('/api/pipeline', pipelineRoutes);
+app.use('/api/scan', scanRoutes);
 
 app.get('/', (req, res) => {
   res.send('Scanner running');

