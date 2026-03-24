@@ -3,6 +3,7 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const http = require('http');
 const { Server } = require('socket.io');
+const crawlRoutes = require('./routes/crawlRoutes');
 
 dotenv.config();
 
@@ -17,6 +18,7 @@ const io = new Server(server, {
 
 app.use(cors({ origin: process.env.CLIENT_ORIGIN || 'http://localhost:3000' }));
 app.use(express.json());
+app.use('/api/crawl', crawlRoutes);
 
 app.get('/', (req, res) => {
   res.send('Scanner running');
