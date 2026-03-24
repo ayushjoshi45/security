@@ -16,6 +16,7 @@ const noSqlInjectionRoutes = require('./routes/noSqlInjectionRoutes');
 const fileUploadRoutes = require('./routes/fileUploadRoutes');
 const securityHeadersRoutes = require('./routes/securityHeadersRoutes');
 const brokenAuthRoutes = require('./routes/brokenAuthRoutes');
+const sensitiveDataExposureRoutes = require('./routes/sensitiveDataExposureRoutes');
 
 dotenv.config();
 
@@ -43,6 +44,7 @@ app.use('/api/nosql-injection', noSqlInjectionRoutes);
 app.use('/api/file-upload', fileUploadRoutes);
 app.use('/api/security-headers', securityHeadersRoutes);
 app.use('/api/broken-auth', brokenAuthRoutes);
+app.use('/api/sensitive-data-exposure', sensitiveDataExposureRoutes);
 
 app.get('/', (req, res) => {
   res.send('Scanner running');
