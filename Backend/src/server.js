@@ -5,6 +5,7 @@ const http = require('http');
 const { Server } = require('socket.io');
 const crawlRoutes = require('./routes/crawlRoutes');
 const payloadRoutes = require('./routes/payloadRoutes');
+const sqlInjectionRoutes = require('./routes/sqlInjectionRoutes');
 
 dotenv.config();
 
@@ -21,6 +22,7 @@ app.use(cors({ origin: process.env.CLIENT_ORIGIN || 'http://localhost:3000' }));
 app.use(express.json());
 app.use('/api/crawl', crawlRoutes);
 app.use('/api/payloads', payloadRoutes);
+app.use('/api/sql', sqlInjectionRoutes);
 
 app.get('/', (req, res) => {
   res.send('Scanner running');
