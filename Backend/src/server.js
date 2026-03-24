@@ -7,6 +7,16 @@ const crawlRoutes = require('./routes/crawlRoutes');
 const payloadRoutes = require('./routes/payloadRoutes');
 const sqlInjectionRoutes = require('./routes/sqlInjectionRoutes');
 const xssRoutes = require('./routes/xssRoutes');
+const csrfRoutes = require('./routes/csrfRoutes');
+const commandInjectionRoutes = require('./routes/commandInjectionRoutes');
+const xxeRoutes = require('./routes/xxeRoutes');
+const pathTraversalRoutes = require('./routes/pathTraversalRoutes');
+const ldapInjectionRoutes = require('./routes/ldapInjectionRoutes');
+const noSqlInjectionRoutes = require('./routes/noSqlInjectionRoutes');
+const fileUploadRoutes = require('./routes/fileUploadRoutes');
+const securityHeadersRoutes = require('./routes/securityHeadersRoutes');
+const brokenAuthRoutes = require('./routes/brokenAuthRoutes');
+const sensitiveDataExposureRoutes = require('./routes/sensitiveDataExposureRoutes');
 
 dotenv.config();
 
@@ -25,6 +35,16 @@ app.use('/api/crawl', crawlRoutes);
 app.use('/api/payloads', payloadRoutes);
 app.use('/api/sql', sqlInjectionRoutes);
 app.use('/api/xss', xssRoutes);
+app.use('/api/csrf', csrfRoutes);
+app.use('/api/command-injection', commandInjectionRoutes);
+app.use('/api/xxe', xxeRoutes);
+app.use('/api/path-traversal', pathTraversalRoutes);
+app.use('/api/ldap-injection', ldapInjectionRoutes);
+app.use('/api/nosql-injection', noSqlInjectionRoutes);
+app.use('/api/file-upload', fileUploadRoutes);
+app.use('/api/security-headers', securityHeadersRoutes);
+app.use('/api/broken-auth', brokenAuthRoutes);
+app.use('/api/sensitive-data-exposure', sensitiveDataExposureRoutes);
 
 app.get('/', (req, res) => {
   res.send('Scanner running');
