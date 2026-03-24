@@ -14,6 +14,7 @@ const pathTraversalRoutes = require('./routes/pathTraversalRoutes');
 const ldapInjectionRoutes = require('./routes/ldapInjectionRoutes');
 const noSqlInjectionRoutes = require('./routes/noSqlInjectionRoutes');
 const fileUploadRoutes = require('./routes/fileUploadRoutes');
+const securityHeadersRoutes = require('./routes/securityHeadersRoutes');
 
 dotenv.config();
 
@@ -39,6 +40,7 @@ app.use('/api/path-traversal', pathTraversalRoutes);
 app.use('/api/ldap-injection', ldapInjectionRoutes);
 app.use('/api/nosql-injection', noSqlInjectionRoutes);
 app.use('/api/file-upload', fileUploadRoutes);
+app.use('/api/security-headers', securityHeadersRoutes);
 
 app.get('/', (req, res) => {
   res.send('Scanner running');
