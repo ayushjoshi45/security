@@ -12,6 +12,7 @@ const commandInjectionRoutes = require('./routes/commandInjectionRoutes');
 const xxeRoutes = require('./routes/xxeRoutes');
 const pathTraversalRoutes = require('./routes/pathTraversalRoutes');
 const ldapInjectionRoutes = require('./routes/ldapInjectionRoutes');
+const noSqlInjectionRoutes = require('./routes/noSqlInjectionRoutes');
 
 dotenv.config();
 
@@ -35,6 +36,7 @@ app.use('/api/command-injection', commandInjectionRoutes);
 app.use('/api/xxe', xxeRoutes);
 app.use('/api/path-traversal', pathTraversalRoutes);
 app.use('/api/ldap-injection', ldapInjectionRoutes);
+app.use('/api/nosql-injection', noSqlInjectionRoutes);
 
 app.get('/', (req, res) => {
   res.send('Scanner running');

