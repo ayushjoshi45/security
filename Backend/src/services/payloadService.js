@@ -23,6 +23,13 @@ const payloadsByType = {
     '..\\..\\..\\windows\\system32\\drivers\\etc\\hosts',
     '%2e%2e%2fetc%2fpasswd',
     '....//....//....//etc/passwd'
+  ],
+  ldap: [
+    '*',
+    'admin*',
+    '*)(|(uid=*))',
+    'admin)(|(password=*))',
+    '*))%00'
   ]
 };
 

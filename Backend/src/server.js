@@ -11,6 +11,7 @@ const csrfRoutes = require('./routes/csrfRoutes');
 const commandInjectionRoutes = require('./routes/commandInjectionRoutes');
 const xxeRoutes = require('./routes/xxeRoutes');
 const pathTraversalRoutes = require('./routes/pathTraversalRoutes');
+const ldapInjectionRoutes = require('./routes/ldapInjectionRoutes');
 
 dotenv.config();
 
@@ -33,6 +34,7 @@ app.use('/api/csrf', csrfRoutes);
 app.use('/api/command-injection', commandInjectionRoutes);
 app.use('/api/xxe', xxeRoutes);
 app.use('/api/path-traversal', pathTraversalRoutes);
+app.use('/api/ldap-injection', ldapInjectionRoutes);
 
 app.get('/', (req, res) => {
   res.send('Scanner running');
