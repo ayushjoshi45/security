@@ -15,6 +15,7 @@ const ldapInjectionRoutes = require('./routes/ldapInjectionRoutes');
 const noSqlInjectionRoutes = require('./routes/noSqlInjectionRoutes');
 const fileUploadRoutes = require('./routes/fileUploadRoutes');
 const securityHeadersRoutes = require('./routes/securityHeadersRoutes');
+const brokenAuthRoutes = require('./routes/brokenAuthRoutes');
 
 dotenv.config();
 
@@ -41,6 +42,7 @@ app.use('/api/ldap-injection', ldapInjectionRoutes);
 app.use('/api/nosql-injection', noSqlInjectionRoutes);
 app.use('/api/file-upload', fileUploadRoutes);
 app.use('/api/security-headers', securityHeadersRoutes);
+app.use('/api/broken-auth', brokenAuthRoutes);
 
 app.get('/', (req, res) => {
   res.send('Scanner running');
