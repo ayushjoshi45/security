@@ -1,0 +1,36 @@
+const express = require('express');
+const cors = require('cors');
+const dotenv = require('dotenv');
+const http = require('http');
+const { Server } = require('socket.io');
+
+dotenv.config();
+
+const app = express();
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: process.env.CLIENT_ORIGIN || 'http://localhost:3000',
+    methods: ['GET', 'POST']
+  }
+});
+
+app.use(cors({ origin: process.env.CLIENT_ORIGIN || 'http://localhost:3000' }));
+app.use(express.json());
+
+app.get('/', (req, res) => {
+  res.send('Scanner running');
+});
+
+io.on('connection', (socket) => {
+  console.log(`Socket connected: ${socket.id}`);
+
+  socket.on('disconnect', () => {
+    console.log(`Socket disconnected: ${socket.id}`);
+  });
+});
+
+const port = Number(process.env.PORT) || 5000;
+server.listen(port, () => {
+  console.log(`Backend server listening on http://localhost:${port}`);
+});
