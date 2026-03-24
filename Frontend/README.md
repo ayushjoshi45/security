@@ -1,16 +1,48 @@
-# React + Vite
+# Frontend Dashboard
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Vite + React frontend for the Security Scanner project.
 
-Currently, two official plugins are available:
+## Run
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+1. Install dependencies:
 
-## React Compiler
+	 npm install
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+2. Start development server:
 
-## Expanding the ESLint configuration
+	 npm run dev
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+3. Build for production:
+
+	 npm run build
+
+## Environment
+
+Optionally set backend URL with:
+
+- VITE_API_BASE_URL=http://localhost:5000
+
+If not set, the app defaults to http://localhost:5000.
+
+## Architecture
+
+The project is organized for easy page expansion:
+
+- src/app:
+	- Router and route definitions
+- src/layouts:
+	- Shared shell layout
+- src/pages:
+	- Route-level pages (Dashboard, Track Scan, Realtime Logs)
+- src/components:
+	- Reusable UI blocks by feature area
+- src/services:
+	- API clients and domain services
+- src/hooks:
+	- Reusable stateful logic (tracked scan polling, realtime logs)
+
+## Adding New Pages
+
+1. Create page component in src/pages.
+2. Add route entry in src/app/routes.jsx.
+3. Route will automatically appear in sidebar navigation.
