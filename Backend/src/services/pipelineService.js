@@ -11,6 +11,7 @@ const { testFileUpload } = require('./fileUploadService');
 const { testSecurityHeaders } = require('./securityHeadersService');
 const { testBrokenAuthentication } = require('./brokenAuthService');
 const { testSensitiveDataExposure } = require('./sensitiveDataExposureService');
+const { getSeverity } = require('./severityService');
 
 function normalizeInputs(inputs) {
   if (!Array.isArray(inputs)) {
@@ -75,6 +76,78 @@ function countVulnerabilitiesFromChecks(checks) {
   return checks.reduce((count, check) => count + (check.vulnerable ? 1 : 0), 0);
 }
 
+function classifyChecks(checks) {
+  return checks.map((check) => {
+    if (!check.vulnerable) {
+      return check;
+    }
+
+    const vulnerabilityType = check.type || check.name || 'Unknown';
+    return {
+      ...check,
+      severity: getSeverity(vulnerabilityType)
+    };
+  });
+}
+
+function collectVulnerabilities(pages) {
+  const vulnerabilities = [];
+
+  for (const page of pages) {
+    for (const check of page.pageChecks || []) {
+      if (!check.vulnerable) {
+        continue;
+      }
+
+      vulnerabilities.push({
+        pageUrl: page.pageUrl,
+        scope: 'page',
+        checkName: check.name,
+        type: check.type || check.name,
+        severity: check.severity || getSeverity(check.type || check.name)
+      });
+    }
+
+    for (const formReport of page.formReports || []) {
+      for (const check of formReport.checks || []) {
+        if (!check.vulnerable) {
+          continue;
+        }
+
+        vulnerabilities.push({
+          pageUrl: page.pageUrl,
+          scope: 'form',
+          formAction: formReport.formAction,
+          formMethod: formReport.formMethod,
+          checkName: check.name,
+          type: check.type || check.name,
+          severity: check.severity || getSeverity(check.type || check.name)
+        });
+      }
+    }
+  }
+
+  return vulnerabilities;
+}
+
+function buildSeverityCounts(vulnerabilities) {
+  const counts = {
+    High: 0,
+    Medium: 0,
+    Low: 0
+  };
+
+  for (const item of vulnerabilities) {
+    const level = item.severity || 'Low';
+    if (counts[level] === undefined) {
+      counts[level] = 0;
+    }
+    counts[level] += 1;
+  }
+
+  return counts;
+}
+
 async function scanWebsitePipeline(baseUrl, options = {}) {
   if (!baseUrl) {
     throw new Error('Missing target baseUrl');
@@ -103,8 +176,10 @@ async function scanWebsitePipeline(baseUrl, options = {}) {
       )
     ]);
 
-    totalChecksExecuted += pageChecks.length;
-    totalVulnerabilities += countVulnerabilitiesFromChecks(pageChecks);
+    const classifiedPageChecks = classifyChecks(pageChecks);
+
+    totalChecksExecuted += classifiedPageChecks.length;
+    totalVulnerabilities += countVulnerabilitiesFromChecks(classifiedPageChecks);
 
     const formReports = [];
     for (const form of page.forms || []) {
@@ -175,15 +250,17 @@ async function scanWebsitePipeline(baseUrl, options = {}) {
         });
       }
 
+      const classifiedFormChecks = classifyChecks(formChecks);
+
       totalFormsScanned += 1;
-      totalChecksExecuted += formChecks.length;
-      totalVulnerabilities += countVulnerabilitiesFromChecks(formChecks);
+      totalChecksExecuted += classifiedFormChecks.length;
+      totalVulnerabilities += countVulnerabilitiesFromChecks(classifiedFormChecks);
 
       formReports.push({
         formAction: targetUrl,
         formMethod: form.method || method,
         inputCount: inputNames.length,
-        checks: formChecks
+        checks: classifiedFormChecks
       });
     }
 
@@ -192,10 +269,13 @@ async function scanWebsitePipeline(baseUrl, options = {}) {
       crawlDepth: page.depth,
       linksDiscovered: (page.links || []).length,
       formsDiscovered: (page.forms || []).length,
-      pageChecks,
+      pageChecks: classifiedPageChecks,
       formReports
     });
   }
+
+  const vulnerabilities = collectVulnerabilities(pageReports);
+  const severityCounts = buildSeverityCounts(vulnerabilities);
 
   return {
     type: 'Full Scan Pipeline',
@@ -212,6 +292,8 @@ async function scanWebsitePipeline(baseUrl, options = {}) {
     totalFormsScanned,
     totalChecksExecuted,
     totalVulnerabilities,
+    severityCounts,
+    vulnerabilities,
     pages: pageReports
   };
 }
