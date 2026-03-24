@@ -6,6 +6,7 @@ const { Server } = require('socket.io');
 const crawlRoutes = require('./routes/crawlRoutes');
 const payloadRoutes = require('./routes/payloadRoutes');
 const sqlInjectionRoutes = require('./routes/sqlInjectionRoutes');
+const xssRoutes = require('./routes/xssRoutes');
 
 dotenv.config();
 
@@ -23,6 +24,7 @@ app.use(express.json());
 app.use('/api/crawl', crawlRoutes);
 app.use('/api/payloads', payloadRoutes);
 app.use('/api/sql', sqlInjectionRoutes);
+app.use('/api/xss', xssRoutes);
 
 app.get('/', (req, res) => {
   res.send('Scanner running');
