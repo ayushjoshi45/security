@@ -10,22 +10,6 @@
       "tech": ["NextAuth/JWT", "bcrypt", "cookies"]
     },
     {
-      "id": "F02",
-      "name": "CSRF Detection",
-      "description": "Detect missing CSRF tokens and Cross-Site Request Forgery vulnerabilities",
-      "priority": "high",
-      "impact": "Identifies insecure form submissions",
-      "tech": ["CSRF token validation", "Form analysis"]
-    },
-    {
-      "id": "F03",
-      "name": "Command Injection Detection",
-      "description": "Test for OS command injection vulnerabilities",
-      "priority": "high",
-      "impact": "Detects execution of arbitrary system commands",
-      "tech": ["Command payloads", "Response analysis"]
-    },
-    {
       "id": "F04",
       "name": "Vulnerability Scanner Engine",
       "description": "Scan web applications for SQL Injection, XSS, and extended vulnerability types",
@@ -48,14 +32,6 @@
       "priority": "medium",
       "impact": "Improves scan coverage and detection",
       "tech": ["Cheerio", "Recursive crawling"]
-    },
-    {
-      "id": "F07",
-      "name": "Advanced Vulnerability Detection",
-      "description": "Extended scanning for XXE, Path Traversal, LDAP, NoSQL injection and more",
-      "priority": "high",
-      "impact": "Comprehensive vulnerability coverage",
-      "tech": ["Advanced payloads", "Response parsing"]
     },
     {
       "id": "F08",
@@ -104,70 +80,6 @@
       "priority": "medium",
       "impact": "Improves user engagement",
       "tech": ["Nodemailer"]
-    },
-    {
-      "id": "F14",
-      "name": "XXE Detection",
-      "description": "Detect XML External Entity injection vulnerabilities",
-      "priority": "high",
-      "impact": "Prevents file disclosure and DoS attacks",
-      "tech": ["XXE payloads", "XML parsing"]
-    },
-    {
-      "id": "F15",
-      "name": "Path Traversal Detection",
-      "description": "Identify directory traversal vulnerabilities",
-      "priority": "high",
-      "impact": "Prevents unauthorized file access",
-      "tech": ["Traversal payloads", "Directory scanning"]
-    },
-    {
-      "id": "F16",
-      "name": "LDAP Injection Detection",
-      "description": "Detect LDAP filter injection in authentication systems",
-      "priority": "medium",
-      "impact": "Secures LDAP-based authentication",
-      "tech": ["LDAP filters", "Query analysis"]
-    },
-    {
-      "id": "F17",
-      "name": "NoSQL Injection Detection",
-      "description": "Detect MongoDB and NoSQL query injection attacks",
-      "priority": "high",
-      "impact": "Secures NoSQL database queries",
-      "tech": ["NoSQL operators", "JSON payload injection"]
-    },
-    {
-      "id": "F18",
-      "name": "Insecure File Upload Detection",
-      "description": "Test for arbitrary file upload vulnerabilities and shell execution",
-      "priority": "high",
-      "impact": "Prevents remote code execution via uploads",
-      "tech": ["File types", "Executable shells"]
-    },
-    {
-      "id": "F19",
-      "name": "HTTP Security Headers Validation",
-      "description": "Verify presence of CSP, X-Frame-Options, HSTS and other security headers",
-      "priority": "medium",
-      "impact": "Ensures proper security configuration",
-      "tech": ["Header analysis", "Response inspection"]
-    },
-    {
-      "id": "F20",
-      "name": "Broken Authentication Testing",
-      "description": "Test for weak passwords and default credential vulnerabilities",
-      "priority": "high",
-      "impact": "Improves authentication security",
-      "tech": ["Brute force detection", "Default credentials"]
-    },
-    {
-      "id": "F21",
-      "name": "Sensitive Data Exposure Detection",
-      "description": "Scan for API keys, passwords, and secrets in responses",
-      "priority": "high",
-      "impact": "Prevents credential leakage",
-      "tech": ["Regex patterns", "Secret scanning"]
     }
   ]
 }
