@@ -1,2 +1,7 @@
-docs
 docs/
+Backend/node_modules/
+Frontend/node_modules/
+Backend/.env
+Frontend/.env
+.DS_Store
+Thumbs.db
